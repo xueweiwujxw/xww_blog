@@ -1,21 +1,27 @@
 baseURL = "http://example.org/"
 
 # Change the default theme to be use when building the site with Hugo
-theme = "LoveIt"
+theme = "loveit"
 
 # website title
 title = "wlanxww's blog"
 
 # language code ["en", "zh-CN", "fr", "pl", ...]
-languageCode = "en"
+languageCode = "zh-CN"
 # language name ["English", "简体中文", "Français", "Polski", ...]
-languageName = "English"
+languageName = "简体中文"
 
 # Author config
 [author]
   name = "wlanxww"
   email = "wlanxww@outlook.com"
   link = ""
+
+[params]
+  title = "Wlanxww's Blog"
+  [params.header]
+    [params.header.title]
+      name = "Wlanxww's Blog"
 
 # Menu config
 [menu]
