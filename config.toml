@@ -17,11 +17,95 @@ languageName = "简体中文"
   email = "wlanxww@outlook.com"
   link = ""
 
+# Loveit params
 [params]
+  defaultTheme = "auto"
+  dateFormat = "2006-01-02"
   title = "Wlanxww's Blog"
+  description = "This is wlanxww blog site"
+
+  # Header config
   [params.header]
+    desktopMode = "fixed"
+    mobileMode = "auto"
     [params.header.title]
       name = "Wlanxww's Blog"
+
+  # Footer config
+  [params.footer]
+    enable = true
+    hugo = true
+    copyright = true
+    author = true
+    since = 2022
+
+  # Section page config
+  [params.section]
+    paginate = 20
+    dateFormat = "01-02"
+
+  # List page config
+  [params.list]
+    paginate = 20
+    dateFormat = "01-02"
+
+  # App icon config
+  [params.app]
+    tile = "Wlanxww's Blog"
+
+  # Search config
+  [params.search]
+    enable = true
+
+  # Home page config
+  [params.home]
+    [params.home.profile]
+      enable = true
+      avatarURL = "https://avatars.githubusercontent.com/u/45992640?v=4"
+      subtitle = "Rust is the best! Linux forever!"
+    [params.home.posts]
+      enable = true
+      paginate = 6
+
+  # Social config in home page
+  [params.social]
+    GitHub = "xueweiwujxw"
+    Steam = "wlanxww"
+    Bilibili = "27142089"
+    Email = "xueweiwujxw@outlook.com"
+
+  # Page global config
+  [params.page]
+    [params.page.share]
+      enable = true
+      Twitter = true
+      Facebook = true
+      HackerNews = false
+      Reddit = true
+      Weibo = true
+    [params.page.comment]
+      enable = true
+      [params.page.comment.giscus]
+        enable = true
+        repo = "xueweiwujxw/xww_blog"
+        repoId = "R_kgDOHshDDQ"
+        category = "Announcements"
+        categoryId = "DIC_kwDOHshDDc4CQYgY"
+        lang = ""
+        mapping = "pathname"
+        reactionsEnabled = "1"
+        emitMetadata = "0"
+        inputPosition = "bottom"
+        lazyLoading = false
+        lightTheme = "light"
+        darkTheme = "dark"
+  
+  # Cookie consent config
+  [params.cookieconsent]
+    enable = true
+    [params.cookieconsent.content]
+      message = "Sure to enable cookie"
+      dismiss = ""
 
 # Menu config
 [menu]
