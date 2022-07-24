@@ -1,4 +1,8 @@
 #!/usr/bin/expect
+
+# never timeout
+set timeout -1
+
 # delete outdated pack
 spawn ssh ubuntu@wlanxww.com
 expect "*" {

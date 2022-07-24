@@ -819,29 +819,29 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
         name = "分类"
         url = "/categories/"
         title = ""
-      # [[languages.zh-cn.menu.main]]
-      #   weight = 4
-      #   identifier = "documentation"
-      #   pre = ""
-      #   name = "文档"
-      #   url = "/categories/documentation/"
-      #   title = ""
-      # [[languages.zh-cn.menu.main]]
-      #   weight = 5
-      #   identifier = "about"
-      #   pre = ""
-      #   post = ""
-      #   name = "关于"
-      #   url = "/about/"
-      #   title = ""
-      # [[languages.zh-cn.menu.main]]
-      #   weight = 6
-      #   identifier = "github"
-      #   pre = "<i class='fab fa-github fa-fw' aria-hidden='true'></i>"
-      #   post = ""
-      #   name = ""
-      #   url = "https://github.com/dillonzq/LoveIt"
-      #   title = "GitHub"
+      [[languages.zh-cn.menu.main]]
+        weight = 4
+        identifier = "documentation"
+        pre = ""
+        name = "文档"
+        url = "/documentation/"
+        title = ""
+      [[languages.zh-cn.menu.main]]
+        weight = 5
+        identifier = "about"
+        pre = ""
+        post = ""
+        name = "关于"
+        url = "/about/"
+        title = ""
+      [[languages.zh-cn.menu.main]]
+        weight = 6
+        identifier = "github"
+        pre = "<i class='fab fa-github fa-fw' aria-hidden='true'></i>"
+        post = ""
+        name = ""
+        url = "https://github.com/xueweiwujxw/xww_blog"
+        title = "GitHub"
     [languages.zh-cn.params]
       [languages.zh-cn.params.search]
         enable = true
@@ -904,30 +904,30 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
         name = "Categories"
         url = "/categories/"
         title = ""
-      # [[languages.en.menu.main]]
-      #   weight = 4
-      #   identifier = "documentation"
-      #   pre = ""
-      #   post = ""
-      #   name = "Docs"
-      #   url = "/categories/documentation/"
-      #   title = ""
-      # [[languages.en.menu.main]]
-      #   weight = 5
-      #   identifier = "about"
-      #   pre = ""
-      #   post = ""
-      #   name = "About"
-      #   url = "/about/"
-      #   title = ""
-      # [[languages.en.menu.main]]
-      #   weight = 6
-      #   identifier = "github"
-      #   pre = "<i class='fab fa-github fa-fw' aria-hidden='true'></i>"
-      #   post = ""
-      #   name = ""
-      #   url = "https://github.com/dillonzq/LoveIt"
-      #   title = "GitHub"
+      [[languages.en.menu.main]]
+        weight = 4
+        identifier = "documentation"
+        pre = ""
+        post = ""
+        name = "Docs"
+        url = "/documentation/"
+        title = ""
+      [[languages.en.menu.main]]
+        weight = 5
+        identifier = "about"
+        pre = ""
+        post = ""
+        name = "About"
+        url = "/about/"
+        title = ""
+      [[languages.en.menu.main]]
+        weight = 6
+        identifier = "github"
+        pre = "<i class='fab fa-github fa-fw' aria-hidden='true'></i>"
+        post = ""
+        name = ""
+        url = "https://github.com/xueweiwujxw/xww_blog"
+        title = "GitHub"
     [languages.en.params]
       [languages.en.params.search]
         enable = true
