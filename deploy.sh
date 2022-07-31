@@ -3,6 +3,10 @@
 # never timeout
 set timeout -1
 
+spawn rm -rf public
+spawn hugo -D
+expect eof
+
 # delete outdated pack
 spawn ssh ubuntu@wlanxww.com
 expect "*" {
