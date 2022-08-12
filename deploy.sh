@@ -4,7 +4,7 @@
 set timeout -1
 
 spawn rm -rf public
-spawn hugo -D
+spawn hugo
 expect eof
 
 # delete outdated pack

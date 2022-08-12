@@ -2,7 +2,7 @@ baseURL = "https://wlanxww.com/"
 
 # theme
 # 主题
-theme = "loveit"
+theme = "FixIt"
 # themes directory
 # 主题目录
 # themesDir = "../.."
@@ -208,7 +208,9 @@ ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
     svgFavicon = ""
     # Android browser theme color
     # Android 浏览器主题色
-    themeColor = "#ffffff"
+    [params.app.themeColor]
+      light = "#ffffff"
+      dark = "#252627"
     # Safari mask icon color
     # Safari 图标颜色
     iconColor = "#5bbad5"
