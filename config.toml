@@ -1136,6 +1136,10 @@ enableEmoji = true
       # "vConsole", "eruda" supported
       # 支持 "vConsole", "eruda"
       type = "vConsole"
+  [params.reward]
+    enable = true
+    wechat = "/images/wechat.jpeg"
+    alipay = "/images/alipay.jpeg"
 
 
 # Markup related configuration in Hugo
