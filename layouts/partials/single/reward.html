@@ -5,16 +5,16 @@
   <div class="qr-code">
     {{ $qrCode := .Site.Params.reward }}
 	{{- $cdnPrefix := .Site.Params.cdnPrefix -}}
-    {{ with $qrCode.wechat -}}
-      <label class="qr-code-image" for="reward">
-        <img class="image" src="{{ $cdnPrefix }}{{ . }}">
-        <span>{{ T "rewardWechat" }}</span>
-      </label>
-    {{- end }}
     {{ with $qrCode.alipay -}}
       <label class="qr-code-image" for="reward">
         <img class="image" src="{{ $cdnPrefix }}{{ . }}">
         <span>{{ T "rewardAlipay" }}</span>
+      </label>
+    {{- end }}
+    {{ with $qrCode.wechat -}}
+      <label class="qr-code-image" for="reward">
+        <img class="image" src="{{ $cdnPrefix }}{{ . }}">
+        <span>{{ T "rewardWechat" }}</span>
       </label>
     {{- end }}
   </div>

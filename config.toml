@@ -1138,8 +1138,8 @@ enableEmoji = true
       type = "vConsole"
   [params.reward]
     enable = true
-    wechat = "/images/wechat.jpeg"
-    alipay = "/images/alipay.jpeg"
+    wechat = "/images/wechat.png"
+    alipay = "/images/alipay.png"
 
 
 # Markup related configuration in Hugo
