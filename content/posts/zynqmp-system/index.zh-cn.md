@@ -278,4 +278,4 @@ index be63b0e19b60..4a2363c66caf 100644
 
 ### eMMC调试
 
-eMMC很顺利，eMMC分区也会单独写一篇，更新后附链接
+eMMC很顺利，具体调试过程[参考]({{< ref "posts/emmc-partition/index.zh-cn.md" >}})
