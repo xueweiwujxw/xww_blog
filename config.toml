@@ -159,7 +159,7 @@ enableEmoji = true
         [languages.zh-cn.params.home.profile]
           enable = true
           # Gravatar 邮箱，用于优先在主页显示的头像
-          gravatarEmail = ""
+          gravatarEmail = "xueweiwujxw@outlook.com"
           # 主页显示头像的 URL
           avatarURL = "/images/avatar.jpeg"
           # 主页显示的网站标题 (支持 HTML 格式)
@@ -383,7 +383,7 @@ enableEmoji = true
         [languages.en.params.home.profile]
           enable = true
           # Gravatar Email for preferred avatar in home page
-          gravatarEmail = ""
+          gravatarEmail = "xueweiwujxw@outlook.com"
           # URL of avatar shown in home page
           avatarURL = "/images/avatar.jpeg"
           # title shown in home page (HTML format is supported)
@@ -653,7 +653,7 @@ enableEmoji = true
     pageStyle = "normal"
     # Gravatar is force-used as the author's avatar since v0.2.14
     # 强制使用 Gravatar 作为作者头像 since v0.2.14
-    gravatarForce = false
+    gravatarForce = true
     # Repost config since v0.2.15
     # 转载配置 since v0.2.15
     [params.page.repost]
@@ -1117,7 +1117,7 @@ enableEmoji = true
   [params.gravatar]
     # Gravatar host, default: "www.gravatar.com"
     # Gravatar 主机，默认：“www.gravatar.com”
-    # host = "www.gravatar.com" # "cn.gravatar.com", "gravatar.loli.net"
+    host = "cn.gravatar.com" # "www.gravatar.com", "gravatar.loli.net"
     # style = "mp" # "", mp, identicon, monsterid, wavatar, retro, blank, robohash
   # Developer options since v0.2.15
   # 开发者选项 since v0.2.15
@@ -1181,7 +1181,7 @@ enableEmoji = true
 # 作者配置
 [author]
   name = "wlanxww"
-  email = "wlanxww@outlook.com"
+  email = "xueweiwujxw@outlook.com"
   link = "https://wlanxww.com"
 
 # Sitemap config
