@@ -10,7 +10,7 @@ expect "*" {
     send "cd ~/xww_blog \r"
     send "hugo --minify --gc \r"
     send "sudo rm -rf /var/www/html/* \r"
-    send "sudo cp -rvf ~/public/* /var/www/html/ \r"
+    send "sudo cp -rvf ./public/* /var/www/html/ \r"
     send "exit \r"
 }
 expect eof
