@@ -1,15 +1,15 @@
 ---
 title: "About Me"
 date: 2022-08-15T10:02:28+08:00
-draft: true
+draft: false
 ---
 
 ### Hi there 👋
 
-- 🔭 I’m currently working on Tsinghua EE
-- 🌱 I’m currently learning Rust and Rust os
-- 📫 How to reach me: xueweiwujxw@outlook.com or xueweiwujxw@gmail.com
-- 📝 I regularly write articles on https://wlanxww.com
+- :telescope: I’m currently working on Tsinghua EE
+- :seedling: I’m currently learning Rust and Rust os
+- :mailbox: How to reach me: xueweiwujxw@outlook.com or xueweiwujxw@gmail.com
+- :keyboard: My github profile: https://github.com/xueweiwujxw
 
 <span>
   <img src="https://github-readme-stats.vercel.app/api?username=xueweiwujxw&show_icons=true&theme=shades-of-purple" width="51%"/>
