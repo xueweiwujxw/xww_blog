@@ -48,6 +48,5 @@ jobs:
           username: ${{ secrets.TENCENTCLOUD_SECRET_USERNAME }}
           key: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
           port: ${{ secrets.TENCENTCLOUD_SECRET_PORT }}
-          rm: true
-          source: "public/*"
+          source: "./public/*"
           target: ${{ secrets.TENCENTCLOUD_SECRET_TRAGET_PATH }}
