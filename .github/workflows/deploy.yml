@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a Hugo site to GitHub Pages
-name: Deploy Hugo site to Pages
+name: Deploy Hugo site to Server
 
 on:
   # Runs on pushes targeting the default branch
@@ -14,11 +14,6 @@ permissions:
   contents: read
   pages: write
   id-token: write
-
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
 
 # Default to bash
 defaults:
@@ -62,5 +57,5 @@ jobs:
           username: ${{ secrets.TENCENTCLOUD_SECRET_USERNAME }}
           key: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
           port: ${{ secrets.TENCENTCLOUD_SECRET_PORT }}
-          source: "./build"
+          source: "./build/*"
           target: ${{ secrets.TENCENTCLOUD_SECRET_TRAGET_PATH }}
