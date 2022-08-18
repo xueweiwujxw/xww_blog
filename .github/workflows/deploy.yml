@@ -50,6 +50,8 @@ jobs:
     runs-on: ubuntu-20.04
     needs: build
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
       - name: copy file via ssh key
         uses: appleboy/scp-action@master
         with:
