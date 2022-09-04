@@ -11,6 +11,22 @@
       <h2 class="toc-title{{ with $params.password }} d-none{{ end }}">{{ T "contents" }} <i class="toc-icon fa-solid fa-angle-down fa-fw"></i></h2>
       <div class="toc-content{{ if eq $toc.auto false }} always-active{{ end }}{{ with $params.password }} d-none{{ end }}" id="toc-content-auto"></div>
     {{- end -}}
+
+    <!-- https://cdn.jsdelivr.net/npm/sakana-widget@2.3.0/lib/sakana.min.js -->
+    <!-- https://cdnjs.cloudflare.com/ajax/libs/sakana-widget/2.3.0/sakana.min.js -->
+    <div id="sakana-widget"></div>
+    <script>
+      function initSakanaWidget() {
+        const takina = SakanaWidget.getCharacter('takina')
+        SakanaWidget.registerCharacter('takina-slow', takina);
+        new SakanaWidget({ character: 'takina-slow', controls: false }).mount('#sakana-widget');
+      }
+    </script>
+    <script
+      async
+      onload="initSakanaWidget()"
+      src="https://cdn.jsdelivr.net/npm/sakana-widget@2.3.0/lib/sakana.min.js"
+    ></script>
   </aside>
 
   <aside class="aside-custom">
