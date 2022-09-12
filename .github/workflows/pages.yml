@@ -42,13 +42,14 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true
-      # - name: Clean last public
-      #   run: rm -rf public
+      - name: Clean last public
+        run: rm -rf public
       - name: Build with Hugo
         run: |
           hugo \
             --minify \
-            --gc
+            --gc \
+            --baseURL ${{ steps.pages.outputs.base_url }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
