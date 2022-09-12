@@ -42,8 +42,8 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true
-      - name: Clean last public
-        run: rm -rf public
+      # - name: Clean last public
+      #   run: rm -rf public
       - name: Build with Hugo
         run: |
           hugo \
