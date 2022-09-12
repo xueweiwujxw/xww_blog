@@ -28,14 +28,8 @@ defaults:
 jobs:
   # Build job
   build:
-    runs-on: ubuntu-20.04
-    env:
-      HUGO_VERSION: 0.101.0
+    runs-on: ubuntu-latest
     steps:
-      - name: Install Hugo CLI
-        run: |
-          wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_Linux-64bit.deb \
-          && sudo dpkg -i ${{ runner.temp }}/hugo.deb
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -43,11 +37,17 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v1
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+      - name: Clean last public
+        run: rm -rf public
       - name: Build with Hugo
         run: |
           hugo \
             --minify \
-            --baseURL ${{ steps.pages.outputs.base_url }}
+            --gc
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
