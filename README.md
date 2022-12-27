@@ -1,0 +1,2 @@
+![Deploy Hugo site to Pages](https://github.com/xueweiwujxw/xww_blog/actions/workflows/pages.yml/badge.svg?event=push)
+![Deploy Hugo site to Server](https://github.com/xueweiwujxw/xww_blog/actions/workflows/deploy.yml/badge.svg?event=push)
