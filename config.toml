@@ -777,13 +777,23 @@ enableEmoji = true
         [languages.zh-cn.menu.main.params]
           icon = "fa-solid fa-users"
       [[languages.zh-cn.menu.main]]
+        identifier = "life"
+        pre = ""
+        post = ""
+        name = "生活"
+        url = "/life/"
+        title = ""
+        weight = 5
+        [languages.zh-cn.menu.main.params]
+          icon = "fa-solid fa-camera-alt"
+      [[languages.zh-cn.menu.main]]
         identifier = "about"
         pre = ""
         post = ""
         name = "关于"
         url = "/about/"
         title = ""
-        weight = 5
+        weight = 6
         [languages.zh-cn.menu.main.params]
           icon = "fa-solid fa-info-circle"
     [languages.zh-cn.params]
@@ -992,13 +1002,23 @@ enableEmoji = true
         [languages.en.menu.main.params]
           icon = "fa-solid fa-users"
       [[languages.en.menu.main]]
+        identifier = "life"
+        pre = ""
+        post = ""
+        name = "Life"
+        url = "/life/"
+        title = ""
+        weight = 5
+        [languages.en.menu.main.params]
+          icon = "fa-solid fa-camera-alt"
+      [[languages.en.menu.main]]
         identifier = "about"
         pre = ""
         post = ""
         name = "About"
         url = "/about/"
         title = ""
-        weight = 5
+        weight = 6
         [languages.en.menu.main.params]
           icon = "fa-solid fa-info-circle"
     [languages.en.params]
