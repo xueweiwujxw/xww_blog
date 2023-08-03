@@ -23,7 +23,7 @@ enableEmoji = true
   [params.search]
     enable = true
     # 搜索引擎的类型 ["lunr", "algolia", "fuse"]
-    type = "lunr"
+    type = "fuse"
     # 文章内容最长索引长度
     contentLength = 4000
     # 搜索框的占位提示语
@@ -48,7 +48,7 @@ enableEmoji = true
       location = 0
       threshold = 0.3
       distance = 100
-      ignoreLocation = false
+      ignoreLocation = true
       useExtendedSearch = false
       ignoreFieldNorm = false
 
