@@ -50,6 +50,9 @@ other = "Category"
 
 [categories]
 other = "Categories"
+
+[life]
+other = "life"
 # === Taxonomy ===
 
 # === Section ===

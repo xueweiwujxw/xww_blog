@@ -50,6 +50,9 @@ other = "分类"
 
 [categories]
 other = "分类"
+
+[life]
+other = "生活"
 # === Taxonomy ===
 
 # === Section ===
