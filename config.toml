@@ -674,7 +674,6 @@ enableEmoji = true
   name = "wlanxww"
   email = "xueweiwujxw@outlook.com"
   link = "https://wlanxww.com"
-  avatar = "/images/avatar.jpeg" # 
 
 # 网站地图配置
 [sitemap]
@@ -723,7 +722,6 @@ enableEmoji = true
   page = ["HTML", "MarkDown"]
   section = ["HTML", "RSS"]
   taxonomy = ["HTML", "RSS"]
-  taxonomyTerm = ["HTML"]
 
 [language]
   [languages.zh-cn]
@@ -870,7 +868,7 @@ enableEmoji = true
           # Gravatar 邮箱，用于优先在主页显示的头像
           gravatarEmail = "xueweiwujxw@outlook.com"
           # 主页显示头像的 URL
-          avatarURL = "/images/avatar.jpeg"
+          avatarURL = ""
           #  头像菜单链接的 identifier
           avatarMenu = ""
           #  主页显示的网站标题（支持 HTML 格式）
