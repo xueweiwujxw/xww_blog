@@ -1,27 +1,34 @@
 ---
-title: "Petalinux eMMC 分区"
+title: 'Petalinux eMMC 分区'
 date: 2022-08-07T21:29:08+08:00
-lastmod: 2022-08-07T21:29:08+08:00
+lastmod: 2024-04-07T17:32:54+08:00
 draft: false
-author: "wlanxww"
-authorLink: "https://wlanxww.com"
-description: "petalinux eMMC 配置"
-tags: ["xilinx", "petalinux", "emmc"]
-categories: ["嵌入式系统"]
+author: 'wlanxww'
+authorLink: 'https://wlanxww.com'
+description: 'petalinux eMMC 配置'
+images: []
+resources:
+  - name: 'featured-image'
+    src: 'featured-image.png'
+tags: ['xilinx', 'petalinux', 'emmc']
+categories: ['嵌入式系统']
 ---
 
 **eMMC** 分区
+
 <!--more-->
 
 ## 内核配置
 
-&emsp;&emsp;启用dosfstools。
-* `petalinux-config -c rootfs`
-* `Filesystem Packages`->`utils`->`dosfstools`->`dosfstools`
+&emsp;&emsp;启用 dosfstools。
+
+- `petalinux-config -c rootfs`
+- `Filesystem Packages`->`utils`->`dosfstools`->`dosfstools`
 
 ## 分区与格式化
 
 &emsp;&emsp;完整分区流程。
+
 ```log
 root@petalinux:~# fdisk /dev/mmcblk0
 
@@ -97,6 +104,7 @@ Calling ioctl() to re-read partition table
  mmcblk0: p1
 root@petalinux:~#  mmcblk0: p1 --- 系统输出的eMMC的分区信息
 ```
+
 &emsp;&emsp;格式化
 
 &emsp;&emsp;`mkdosfs /dev/mmcblk0p1`，`/dev/mmcblk0p1`是分区后生成的字符设备。
