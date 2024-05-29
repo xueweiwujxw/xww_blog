@@ -247,7 +247,7 @@ enableEmoji = true
       #  是否显示代码块的编辑按钮
       edit = true
       # 默认展开显示的代码行数
-      maxShownLines = 10
+      maxShownLines = 100
     #  文章编辑
     [params.page.edit]
       enable = false
