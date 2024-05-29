@@ -2,7 +2,7 @@
 title: 'U-boot 加载 bit 文件'
 date: 2024-05-29T10:44:04+08:00
 lastmod: 2024-05-29T10:44:04+08:00
-draft: true
+draft: false
 author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
 description: 'U-boot 加载 bit 文件'
