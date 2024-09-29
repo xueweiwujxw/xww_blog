@@ -1,0 +1,22 @@
+# -------------------------------------------------------------------------------------
+# Hugo Configuration
+# See: https://gohugo.io/getting-started/configuration/
+# -------------------------------------------------------------------------------------
+
+title = "Wlanxww的博客"
+baseURL = "https://wlanxww.com/"
+theme = [
+  "FixIt",
+  "shortcode-docs-bookmark"
+]
+defaultContentLanguage = "zh-cn"
+languageCode = "zh-cn"
+hasCJKLanguage = true
+enableRobotsTXT = true
+enableEmoji = true
+enableGitInfo = true
+relativeURLs = false
+buildDrafts = false
+summaryLength = 150
+# ignore some build errors
+ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]

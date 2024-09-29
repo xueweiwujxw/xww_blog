@@ -1,7 +1,6 @@
 ---
 title: "友情链接"
-subtitle: ""
-type: "friends"
+layout: friends
 date: 2022-08-18T12:58:24+08:00
 description: "wlanxww's friends"
 keywords: 
