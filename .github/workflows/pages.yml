@@ -45,8 +45,7 @@ jobs:
       - name: Clean last public
         run: rm -rf public
       - name: Build with Hugo
-        run: hugo --logLevel=warn --gc --minify \
-            --baseURL ${{ steps.pages.outputs.base_url }}
+        run: hugo --logLevel=warn --gc --minify --baseURL ${{ steps.pages.outputs.base_url }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
