@@ -4,7 +4,7 @@ name: Deploy Hugo site to Server
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["master"]
+    branches: ['master']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
       - name: Clean last public
         run: rm -rf public
       - name: Build with Hugo
-        run: hugo -v --gc --minify
+        run: hugo --logLevel=warn --gc --minify
       - name: copy file via ssh key
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -46,5 +46,5 @@ jobs:
           username: ${{ secrets.TENCENTCLOUD_SECRET_USERNAME }}
           key: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
           port: ${{ secrets.TENCENTCLOUD_SECRET_PORT }}
-          source: "./public/*"
+          source: './public/*'
           target: ${{ secrets.TENCENTCLOUD_SECRET_TRAGET_PATH }}
