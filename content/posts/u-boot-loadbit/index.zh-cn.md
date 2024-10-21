@@ -1,7 +1,7 @@
 ---
 title: 'U-boot 加载 bit 文件'
 date: 2024-05-29T10:44:04+08:00
-lastmod: 2024-10-02T20:47:58+08:00
+lastmod: 2024-10-21T20:30:23+08:00
 draft: false
 author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
@@ -223,7 +223,310 @@ void FsblHandoff(u32 FsblStartAddr)
 }
 ```
 
-可以看到如果没有 `BitstreamFlag`，就不会执行 `post_config`，根据注释可以得知这是在编译的时候确定的，所以未包含 bit 的 `xsa` 文件会导致 `post_config` 无法正确执行。
+可以看到如果没有 `BitstreamFlag`，就不会执行 `post_config`，所以需要确定`BitstreamFlag`在哪里确定，很容易发现是在下面这个函数中确定的。
+
+`BitstreamFlag`[定义](https://github.com/Xilinx/embeddedsw/blob/xilinx_v2021.1/lib/sw_apps/zynq_fsbl/src/image_mover.c#L101)
+
+```c
+/*
+ * Partition information flags
+ */
+u8 EncryptedPartitionFlag;
+u8 PLPartitionFlag;
+u8 PSPartitionFlag;
+u8 SignedPartitionFlag;
+u8 PartitionChecksumFlag;
+u8 BitstreamFlag;
+u8 ApplicationFlag;
+```
+
+`BitstreamFlag`[赋值 `LoadBootImage`](https://github.com/Xilinx/embeddedsw/blob/xilinx_v2021.1/lib/sw_apps/zynq_fsbl/src/image_mover.c#L136)，可以看出来是通过读取分区头信息的属性，判断是否存在 bit 文件的，其中`ATTRIBUTE_PL_IMAGE_MASK`的值在[image_mover.h](https://github.com/Xilinx/embeddedsw/blob/xilinx_v2021.1/lib/sw_apps/zynq_fsbl/src/image_mover.h#L70)中定义，为 0x20
+
+```c
+u32 LoadBootImage(void)
+{
+	// ... 省略
+
+	/*
+	 * Resetting the Flags
+	 */
+	BitstreamFlag = 0;
+	ApplicationFlag = 0;
+
+	// ... 省略
+
+	/*
+	 * Get partitions header information
+	 */
+	Status = GetPartitionHeaderInfo(ImageStartAddress);
+	if (Status != XST_SUCCESS) {
+		fsbl_printf(DEBUG_GENERAL, "Partition Header Load Failed\r\n");
+		OutputStatus(GET_HEADER_INFO_FAIL);
+		FsblFallback();
+	}
+
+	// ... 省略
+
+#ifdef MMC_SUPPORT
+	/*
+	 * In case of MMC support
+	 * boot image preset in MMC will not have FSBL partition
+	 */
+	PartitionNum = 0;
+#else
+	/*
+	 * First partition header was ignored by FSBL
+	 * As it contain FSBL partition information
+	 */
+	PartitionNum = 1;
+#endif
+
+	while (PartitionNum < PartitionCount) {
+		// ... 省略
+
+		if (PartitionAttr & ATTRIBUTE_PL_IMAGE_MASK) {
+			fsbl_printf(DEBUG_INFO, "Bitstream\r\n");
+			PLPartitionFlag = 1;
+			PSPartitionFlag = 0;
+			BitstreamFlag = 1;
+			if (ApplicationFlag == 1) {
+#ifdef STDOUT_BASEADDRESS
+				xil_printf("\r\nFSBL Warning !!!"
+						"Bitstream not loaded into PL\r\n");
+                xil_printf("Partition order invalid\r\n");
+#endif
+				break;
+			}
+		}
+
+		// ... 省略
+
+		/*
+		 * Increment partition number
+		 */
+		PartitionNum++;
+	}
+
+	return ExecAddress;
+}
+```
+
+所以我们可以推测出来，应该是 petalinux 在打包的时候没有包含 bit 文件导致的，为了验证，可以使用命令`bootgen -read BOOT.BIN -arch zynq > bininfo.txt`读取 BOOT.BIN 分区头的属性。
+
+> [!TIP]- 包含 bitstream 的文件
+>
+> ```txt {data-open=true}
+> ****** Xilinx Bootgen v2021.1
+>   **** Build date : Jun 10 2021-20:11:31
+>     ** Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
+>
+> --------------------------------------------------------------------------------
+>    BOOT HEADER
+> --------------------------------------------------------------------------------
+>         boot_vectors (0x00) : 0xeafffffeeafffffeeafffffeeafffffeeafffffeeafffffeeafffffeeafffffe
+>      width_detection (0x20) : 0xaa995566
+>             image_id (0x24) : 0x584c4e58
+>  encryption_keystore (0x28) : 0x00000000
+>       header_version (0x2c) : 0x01010000
+>    fsbl_sourceoffset (0x30) : 0x00001700
+>          fsbl_length (0x34) : 0x00018008
+>    fsbl_load_address (0x38) : 0x00000000
+>    fsbl_exec_address (0x3C) : 0x00000000
+>    fsbl_total_length (0x40) : 0x00018008
+>     qspi_config-word (0x44) : 0x00000001
+>             checksum (0x48) : 0xfc164530
+>           iht_offset (0x98) : 0x000008c0
+>           pht_offset (0x9c) : 0x00000c80
+> --------------------------------------------------------------------------------
+>    IMAGE HEADER TABLE
+> --------------------------------------------------------------------------------
+>              version (0x00) : 0x01020000        total_images (0x04) : 0x00000004
+>           pht_offset (0x08) : 0x00000c80           ih_offset (0x0c) : 0x00000900
+>        hdr_ac_offset (0x10) : 0x00000000
+> --------------------------------------------------------------------------------
+>    IMAGE HEADER (zynq_fsbl.elf)
+> --------------------------------------------------------------------------------
+>           next_ih(W) (0x00) : 0x00000250
+>          next_pht(W) (0x04) : 0x00000320
+>     total_partitions (0x08) : 0x00000000
+>     total_partitions (0x0c) : 0x00000001
+>                 name (0x10) : zynq_fsbl.elf
+> --------------------------------------------------------------------------------
+>    IMAGE HEADER (zynq_top_wrapper.bit)
+> --------------------------------------------------------------------------------
+>           next_ih(W) (0x00) : 0x00000260
+>          next_pht(W) (0x04) : 0x00000330
+>     total_partitions (0x08) : 0x00000000
+>     total_partitions (0x0c) : 0x00000001
+>                 name (0x10) : zynq_top_wrapper.bit
+> --------------------------------------------------------------------------------
+>    IMAGE HEADER (u-boot.elf)
+> --------------------------------------------------------------------------------
+>           next_ih(W) (0x00) : 0x00000270
+>          next_pht(W) (0x04) : 0x00000340
+>     total_partitions (0x08) : 0x00000000
+>     total_partitions (0x0c) : 0x00000001
+>                 name (0x10) : u-boot.elf
+> --------------------------------------------------------------------------------
+>    IMAGE HEADER (system.dtb)
+> --------------------------------------------------------------------------------
+>           next_ih(W) (0x00) : 0x00000000
+>          next_pht(W) (0x04) : 0x00000350
+>     total_partitions (0x08) : 0x00000000
+>     total_partitions (0x0c) : 0x00000001
+>                 name (0x10) : system.dtb
+> --------------------------------------------------------------------------------
+>    PARTITION HEADER TABLE (zynq_fsbl.elf.0)
+> --------------------------------------------------------------------------------
+>     encrypted_length (0x00) : 0x00006002  unencrypted_length (0x04) : 0x00006002
+>         total_length (0x08) : 0x00006002           load_addr (0x0c) : 0x00000000
+>            exec_addr (0x10) : 0x00000000    partition_offset (0x14) : 0x000005c0
+>           attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>      checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000240
+>            ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xfffed7e8
+>  attribute list -
+>                trustzone [non-secure]            el [el-0]
+>               exec_state [aarch-32]     dest_device [none]
+>               encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+>    PARTITION HEADER TABLE (zynq_top_wrapper.bit.0)
+> --------------------------------------------------------------------------------
+>     encrypted_length (0x00) : 0x00191008  unencrypted_length (0x04) : 0x00191008
+>         total_length (0x08) : 0x00191008           load_addr (0x0c) : 0x00000000
+>            exec_addr (0x10) : 0x00000000    partition_offset (0x14) : 0x000065d0
+>           attributes (0x18) : 0x00000020       section_count (0x1C) : 0x00000001
+>      checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000250
+>            ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xffb467a6
+>  attribute list -
+>                trustzone [non-secure]            el [el-0]
+>               exec_state [el-0]         dest_device [none]
+>               encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+>    PARTITION HEADER TABLE (u-boot.elf.0)
+> --------------------------------------------------------------------------------
+>     encrypted_length (0x00) : 0x000388c6  unencrypted_length (0x04) : 0x000388c6
+>         total_length (0x08) : 0x000388c6           load_addr (0x0c) : 0x04000000
+>            exec_addr (0x10) : 0x04000000    partition_offset (0x14) : 0x001975e0
+>           attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>      checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000260
+>            ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xf7dbed5c
+>  attribute list -
+>                trustzone [non-secure]            el [el-0]
+>               exec_state [aarch-32]     dest_device [none]
+>               encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+>    PARTITION HEADER TABLE (system.dtb.0)
+> --------------------------------------------------------------------------------
+>     encrypted_length (0x00) : 0x00001331  unencrypted_length (0x04) : 0x00001331
+>         total_length (0x08) : 0x00001331           load_addr (0x0c) : 0x00100000
+>            exec_addr (0x10) : 0x00000000    partition_offset (0x14) : 0x001cfeb0
+>           attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>      checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000270
+>            ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xffd2c53b
+>  attribute list -
+>                trustzone [non-secure]            el [el-0]
+>               exec_state [aarch-32]     dest_device [none]
+>               encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+> ```
+
+> [!TIP]- 不包含 bitstream 的文件
+>
+> ```txt {data-open=true}
+> ****** Xilinx Bootgen v2021.1
+>  **** Build date : Jun 10 2021-20:11:31
+>    ** Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
+>
+> --------------------------------------------------------------------------------
+>   BOOT HEADER
+> --------------------------------------------------------------------------------
+>        boot_vectors (0x00) : 0xeafffffeeafffffeeafffffeeafffffeeafffffeeafffffeeafffffeeafffffe
+>     width_detection (0x20) : 0xaa995566
+>            image_id (0x24) : 0x584c4e58
+> encryption_keystore (0x28) : 0x00000000
+>      header_version (0x2c) : 0x01010000
+>   fsbl_sourceoffset (0x30) : 0x00001700
+>         fsbl_length (0x34) : 0x00018008
+>   fsbl_load_address (0x38) : 0x00000000
+>   fsbl_exec_address (0x3C) : 0x00000000
+>   fsbl_total_length (0x40) : 0x00018008
+>    qspi_config-word (0x44) : 0x00000001
+>            checksum (0x48) : 0xfc164530
+>          iht_offset (0x98) : 0x000008c0
+>          pht_offset (0x9c) : 0x00000c80
+> --------------------------------------------------------------------------------
+>   IMAGE HEADER TABLE
+> --------------------------------------------------------------------------------
+>             version (0x00) : 0x01020000        total_images (0x04) : 0x00000003
+>          pht_offset (0x08) : 0x00000c80           ih_offset (0x0c) : 0x00000900
+>       hdr_ac_offset (0x10) : 0x00000000
+> --------------------------------------------------------------------------------
+>   IMAGE HEADER (zynq_fsbl.elf)
+> --------------------------------------------------------------------------------
+>          next_ih(W) (0x00) : 0x00000250
+>         next_pht(W) (0x04) : 0x00000320
+>    total_partitions (0x08) : 0x00000000
+>    total_partitions (0x0c) : 0x00000001
+>                name (0x10) : zynq_fsbl.elf
+> --------------------------------------------------------------------------------
+>   IMAGE HEADER (u-boot.elf)
+> --------------------------------------------------------------------------------
+>          next_ih(W) (0x00) : 0x00000260
+>         next_pht(W) (0x04) : 0x00000330
+>    total_partitions (0x08) : 0x00000000
+>    total_partitions (0x0c) : 0x00000001
+>                name (0x10) : u-boot.elf
+> --------------------------------------------------------------------------------
+>   IMAGE HEADER (system.dtb)
+> --------------------------------------------------------------------------------
+>          next_ih(W) (0x00) : 0x00000000
+>         next_pht(W) (0x04) : 0x00000340
+>    total_partitions (0x08) : 0x00000000
+>    total_partitions (0x0c) : 0x00000001
+>                name (0x10) : system.dtb
+> --------------------------------------------------------------------------------
+>   PARTITION HEADER TABLE (zynq_fsbl.elf.0)
+> --------------------------------------------------------------------------------
+>    encrypted_length (0x00) : 0x00006002  unencrypted_length (0x04) : 0x00006002
+>        total_length (0x08) : 0x00006002           load_addr (0x0c) : 0x00000000
+>           exec_addr (0x10) : 0x00000000    partition_offset (0x14) : 0x000005c0
+>          attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>     checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000240
+>           ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xfffed7e8
+> attribute list -
+>               trustzone [non-secure]            el [el-0]
+>              exec_state [aarch-32]     dest_device [none]
+>              encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+>   PARTITION HEADER TABLE (u-boot.elf.0)
+> --------------------------------------------------------------------------------
+>    encrypted_length (0x00) : 0x000389eb  unencrypted_length (0x04) : 0x000389eb
+>        total_length (0x08) : 0x000389eb           load_addr (0x0c) : 0x04000000
+>           exec_addr (0x10) : 0x04000000    partition_offset (0x14) : 0x000065d0
+>          attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>     checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000250
+>           ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xf7f4fa0d
+> attribute list -
+>               trustzone [non-secure]            el [el-0]
+>              exec_state [aarch-32]     dest_device [none]
+>              encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+>   PARTITION HEADER TABLE (system.dtb.0)
+> --------------------------------------------------------------------------------
+>    encrypted_length (0x00) : 0x00001667  unencrypted_length (0x04) : 0x00001667
+>        total_length (0x08) : 0x00001667           load_addr (0x0c) : 0x00100000
+>           exec_addr (0x10) : 0x00000000    partition_offset (0x14) : 0x0003efc0
+>          attributes (0x18) : 0x00000010       section_count (0x1C) : 0x00000001
+>     checksum_offset (0x20) : 0x00000000          iht_offset (0x24) : 0x00000260
+>           ac_offset (0x28) : 0x00000000            checksum (0x3c) : 0xffebca99
+> attribute list -
+>               trustzone [non-secure]            el [el-0]
+>              exec_state [aarch-32]     dest_device [none]
+>              encryption [no]                  core [none]
+> --------------------------------------------------------------------------------
+> ```
+
+对比后发现，包含 bitstream 的文件多出了一个分区，存放了 bit 文件，并且`attributes (0x18) : 0x00000020`，所以`BitstreamFlag`的值最终为 1，可以执行 `post_config`，反之不执行。
 
 #### 添加 postconfig
 
@@ -298,9 +601,8 @@ CFLAGS_REMOVE_ps7_init_gpl.o := -Wstrict-prototypes
 CFLAGS_ps7_init_gpl.o := -I$(srctree)/$(src)
 ```
 
-{{< admonition type=notice title="提示" open=true >}}
-这里为什么是`ps7_init_gpl.c`而不是`ps7_init.c`，目前不清楚原因，但是可以参考两者的代码，基本上一致，所以按照 xilinx 的 u-boot 源码选择`ps7_init_gpl.c`，
-{{< /admonition >}}
+> [!NOTE] 提示
+> 这里为什么是`ps7_init_gpl.c`而不是`ps7_init.c`，目前不清楚原因，但是可以参考两者的代码，基本上一致，所以按照 xilinx 的 u-boot 源码选择`ps7_init_gpl.c`
 
 现在还差最后一步，怎样将我们的`ps7_init_gpl.c/h`加入到 `u-boot` 源码并添加指令。我们可以借助`project-spec/meta-user/recipes-bsp/u-boot/`的`u-boot-xlnx_%.bbappend`，将代码 install 到 `u-boot` 的源码。
 

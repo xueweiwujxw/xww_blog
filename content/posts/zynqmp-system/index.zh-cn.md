@@ -1,7 +1,7 @@
 ---
 title: 'zynmp系统调试踩的坑'
 date: 2022-07-22T00:04:29+08:00
-lastmod: 2024-04-07T17:31:13+08:00
+lastmod: 2024-10-21T20:29:13+08:00
 draft: false
 author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
@@ -46,21 +46,20 @@ categories: ['嵌入式系统']
 ### 生成 Petalinux 系统
 
 &emsp;&emsp;生成系统没什么好说的，根据 petalinux 文档操作即可，注意选择正确的`template`，zynqmp 自然是选择`zynqMP`。导入 vivado 编译生成的`xsa`文件，然后编译一次，petalinux 自己生成设备树，方便后续修改。
-{{< admonition type=notice title="提示" open=true >}}
-&emsp;&emsp;因为 Petalinux 每次编译会从服务器下载`xlnx`的源码，所以建议自己配置一个本地服务器或者公司内网使用的服务器，推荐后者。<br>
-编辑 Petalinux 的`Yocto`设置，启用`YOCTO_NETWORK_SSTATE_FEEDS`，并设置`YOCTO_NETWORK_SSTATE_FEEDS_URL`为配置好的服务器地址，这样可以大幅减少第一次编译的时间，配置服务器之后会写另外一篇博客，更新后回附上链接。
-`project-spec/configs/config`部分内容如下
 
-```
-CONFIG_YOCTO_NETWORK_SSTATE_FEEDS=y
-
-#
-# Network sstate feeds URL
-#
-CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="http://petamirror.com:12333/sswreleases/rel-v2021/aarch64/sstate-cache"
-```
-
-{{< /admonition >}}
+> [!NOTE]+ 提示
+> &emsp;&emsp;因为 Petalinux 每次编译会从服务器下载`xlnx`的源码，所以建议自己配置一个本地服务器或者公司内网使用的服务器，推荐后者。<br>
+> 编辑 Petalinux 的`Yocto`设置，启用`YOCTO_NETWORK_SSTATE_FEEDS`，并设置`YOCTO_NETWORK_SSTATE_FEEDS_URL`为配置好的服务器地址，这样可以大幅减少第一次编译的时间，配置服务器之后会写另外一篇博客，更新后回附上链接。
+> `project-spec/configs/config`部分内容如下
+>
+> ```
+> CONFIG_YOCTO_NETWORK_SSTATE_FEEDS=y
+>
+> #
+> # Network sstate feeds URL
+> #
+> CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="http://petamirror.com:12333/sswreleases/rel-v2021/aarch64/sstate-cache"
+> ```
 
 ## 接口调试
 
@@ -256,46 +255,46 @@ index 7231c5a3eece..85bb308959fb 100644
 ```
 
 &emsp;&emsp;在解决了硬件电路上接反的问题后，连接显示器后可以正确显示出来。
-{{< admonition type=warning title="警告" open=false >}}
-目前的版本挑显示器，测试的显示器中仅有一台不能正确显示，dp 转 VGA 也可以正常工作。
 
-```diff
-diff --git a/drivers/gpu/drm/xlnx/zynqmp_dp.c b/drivers/gpu/drm/xlnx/zynqmp_dp.c
-index be63b0e19b60..4a2363c66caf 100644
---- a/drivers/gpu/drm/xlnx/zynqmp_dp.c
-+++ b/drivers/gpu/drm/xlnx/zynqmp_dp.c
-@@ -958,18 +958,24 @@ static int zynqmp_dp_train(struct zynqmp_dp *dp)
- 	zynqmp_dp_write(dp->iomem, ZYNQMP_DP_TX_PHY_CLOCK_FEEDBACK_SETTING,
- 			reg);
- 	ret = zynqmp_dp_phy_ready(dp);
--	if (ret < 0)
-+	if (ret < 0) {
-+		dev_err(dp->dev, "DP Phy is not ready\n");
- 		return ret;
-+	}
-
- 	zynqmp_dp_write(dp->iomem, ZYNQMP_DP_TX_SCRAMBLING_DISABLE, 1);
- 	memset(dp->train_set, 0, ARRAY_SIZE(dp->train_set));
- 	ret = zynqmp_dp_link_train_cr(dp);
--	if (ret)
-+	if (ret) {
-+		dev_err(dp->dev, "clock recovery train is done unsuccessfull\n");
- 		return ret;
-+	}
-
- 	ret = zynqmp_dp_link_train_ce(dp);
--	if (ret)
-+	if (ret) {
-+		dev_err(dp->dev, "channel equalization train is done unsuccessfull\n");
- 		return ret;
-+	}
-
- 	ret = drm_dp_dpcd_writeb(&dp->aux, DP_TRAINING_PATTERN_SET,
- 				 DP_TRAINING_PATTERN_DISABLE);
-```
-
-在驱动中添加了上述调试输出后发现，无法工作的显示器会报`channel equalization train is done unsuccessfull`，目前原因不明，这里具体的报错源头是 aux 通道协商时，返回的信道均衡值不对。
-{{< /admonition >}}
+> [!WARNING]- 警告
+> 目前的版本挑显示器，测试的显示器中仅有一台不能正确显示，dp 转 VGA 也可以正常工作。
+>
+> ```diff
+> diff --git a/drivers/gpu/drm/xlnx/zynqmp_dp.c b/drivers/gpu/drm/xlnx/zynqmp_dp.c
+> index be63b0e19b60..4a2363c66caf 100644
+> --- a/drivers/gpu/drm/xlnx/zynqmp_dp.c
+> +++ b/drivers/gpu/drm/xlnx/zynqmp_dp.c
+> @@ -958,18 +958,24 @@ static int zynqmp_dp_train(struct zynqmp_dp *dp)
+>  	zynqmp_dp_write(dp->iomem, ZYNQMP_DP_TX_PHY_CLOCK_FEEDBACK_SETTING,
+>  			reg);
+>  	ret = zynqmp_dp_phy_ready(dp);
+> -	if (ret < 0)
+> +	if (ret < 0) {
+> +		dev_err(dp->dev, "DP Phy is not ready\n");
+>  		return ret;
+> +	}
+>
+>  	zynqmp_dp_write(dp->iomem, ZYNQMP_DP_TX_SCRAMBLING_DISABLE, 1);
+>  	memset(dp->train_set, 0, ARRAY_SIZE(dp->train_set));
+>  	ret = zynqmp_dp_link_train_cr(dp);
+> -	if (ret)
+> +	if (ret) {
+> +		dev_err(dp->dev, "clock recovery train is done unsuccessfull\n");
+>  		return ret;
+> +	}
+>
+>  	ret = zynqmp_dp_link_train_ce(dp);
+> -	if (ret)
+> +	if (ret) {
+> +		dev_err(dp->dev, "channel equalization train is done unsuccessfull\n");
+>  		return ret;
+> +	}
+>
+>  	ret = drm_dp_dpcd_writeb(&dp->aux, DP_TRAINING_PATTERN_SET,
+>  				 DP_TRAINING_PATTERN_DISABLE);
+> ```
+>
+> 在驱动中添加了上述调试输出后发现，无法工作的显示器会报`channel equalization train is done unsuccessfull`，目前原因不明，这里具体的报错源头是 aux 通道协商时，返回的信道均衡值不对。
 
 ### eMMC 调试
 
