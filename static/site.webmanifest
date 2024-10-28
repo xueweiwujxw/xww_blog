@@ -1,0 +1,27 @@
+{
+    "name": "Wlanxww's Blog",
+    "short_name": "WlanxwwBlog",
+    "start_url": "/",
+    "description": "Wlanxww Blog and Notes",
+    "theme_color": "#f8f8f8",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "icons": [
+      {
+        "src": "images/avatar.jpeg",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "images/avatar.jpeg",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "images/avatar.jpeg",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
