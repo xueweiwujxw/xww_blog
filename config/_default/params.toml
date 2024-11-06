@@ -860,3 +860,21 @@ disableThemeInject = false
     [page.seo.publisher]
       name = "wlanxww"
       logoUrl = "/images/avatar.jpeg"
+
+[customPartials]
+  head = []
+  aside = [
+    "custom/aside.html"
+  ]
+  comment = []
+  footer = []
+  widgets = []
+  assets = [
+    "inject/cmpt-flyfish.html",
+  ]
+  postFooterBefore = []
+  postFooterAfter = []
+[flyfish]
+  enable = true
+  light = "#f6f8fa"
+  dark = "#2c484f"

@@ -4,3 +4,6 @@
 [submodule "themes/shortcode-docs-bookmark"]
 	path = themes/shortcode-docs-bookmark
 	url = https://github.com/hugo-fixit/shortcode-docs-bookmark
+[submodule "themes/cmpt-flyfish"]
+	path = themes/cmpt-flyfish
+	url = https://github.com/hugo-fixit/cmpt-flyfish.git
