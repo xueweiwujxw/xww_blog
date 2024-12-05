@@ -863,6 +863,12 @@ disableThemeInject = false
 
 [customPartials]
   head = []
+  menuDesktop = [
+    "inject/translate-menu-desktop.html",
+  ]
+  menuMobile = [
+    "inject/translate-menu-mobile.html",
+  ]
   aside = [
     "custom/aside.html"
   ]
@@ -870,6 +876,7 @@ disableThemeInject = false
   footer = []
   widgets = []
   assets = [
+    "inject/cmpt-translate.html",
     "inject/cmpt-flyfish.html",
   ]
   postFooterBefore = []
@@ -878,3 +885,11 @@ disableThemeInject = false
   enable = true
   light = "#f6f8fa"
   dark = "#2c484f"
+[autoTranslate]
+  enable = true
+  service = "client.edge"
+  languages = ["chinese_traditional", "english", "japanese", "french", "russian", "spanish", "deutsch"]
+  ignoreID = []
+  ignoreClass = []
+  ignoreTag = []
+  detectLocalLanguage = false

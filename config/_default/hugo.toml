@@ -8,10 +8,10 @@ baseURL = "https://wlanxww.com/"
 theme = [
   "FixIt",
   "cmpt-flyfish",
-  "shortcode-docs-bookmark"
+  "shortcode-docs-bookmark",
+  "cmpt-translate",
 ]
 defaultContentLanguage = "zh-cn"
-languageCode = "zh-cn"
 hasCJKLanguage = true
 enableRobotsTXT = true
 enableEmoji = true
@@ -21,3 +21,8 @@ buildDrafts = false
 summaryLength = 150
 # ignore some build errors
 ignoreErrors = ["error-remote-getjson", "error-missing-instagram-accesstoken"]
+
+[languages]
+  [languages.zh-cn]
+    languageCode = "zh-CN"
+    languageName = "简体中文"

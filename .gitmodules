@@ -7,3 +7,6 @@
 [submodule "themes/cmpt-flyfish"]
 	path = themes/cmpt-flyfish
 	url = https://github.com/hugo-fixit/cmpt-flyfish.git
+[submodule "themes/cmpt-translate"]
+	path = themes/cmpt-translate
+	url = https://github.com/hugo-fixit/cmpt-translate.git
