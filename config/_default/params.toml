@@ -249,7 +249,7 @@ disableThemeInject = false
 [social]
   GitHub = "xueweiwujxw"
   Linkedin = ""
-  Twitter = ""
+  X = ""
   Instagram = ""
   Facebook = ""
   Telegram = ""
@@ -334,14 +334,6 @@ disableThemeInject = false
   Phone = ""
   Email = "xueweiwujxw@outlook.com"
   RSS = true
-  # custom social links like the following
-  # [social.twitter]
-  #   id = "lruihao"
-  #   weight = 3
-  #   prefix = "https://twitter.com/"
-  #   Title = "Twitter"
-  #   [social.twitter.icon]
-  #     class = "fa-brands fa-x-twitter fa-fw"
 
 # TypeIt config
 [typeit]
@@ -674,7 +666,7 @@ disableThemeInject = false
   # social share links in post page
   [page.share]
     enable = true
-    Twitter = true
+    X = true
     Facebook = true
     Linkedin = false
     Whatsapp = false
