@@ -7,9 +7,6 @@ author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
 description: 'Petalinux 双启动模式'
 images: []
-resources:
-  - name: 'featured-image'
-    src: 'featured-image.png'
 tags: ['xilinx', 'petalinux', 'boot']
 categories: ['嵌入式系统']
 ---

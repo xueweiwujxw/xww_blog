@@ -7,9 +7,6 @@ author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
 description: 'U-boot 加载 bit 文件'
 images: []
-resources:
-  - name: 'featured-image'
-    src: 'featured-image.png'
 tags: ['xilinx', 'petalinux', 'u-boot']
 categories: ['嵌入式系统']
 ---

@@ -7,9 +7,6 @@ author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
 description: 'petalinux eMMC 配置'
 images: []
-resources:
-  - name: 'featured-image'
-    src: 'featured-image.png'
 tags: ['xilinx', 'petalinux', 'emmc']
 categories: ['嵌入式系统']
 ---

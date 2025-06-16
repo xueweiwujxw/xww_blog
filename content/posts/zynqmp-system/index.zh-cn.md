@@ -7,9 +7,6 @@ author: 'wlanxww'
 authorLink: 'https://wlanxww.com'
 description: 'petalinux调试'
 images: []
-resources:
-  - name: 'featured-image'
-    src: 'featured-image.png'
 tags: ['xilinx', 'petalinux', 'zynqmp']
 categories: ['嵌入式系统']
 ---
