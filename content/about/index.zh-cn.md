@@ -7,7 +7,7 @@ draft: false
 ### 大家好 👋
 
 - 🔭 我目前在清华大学电子系工作
-- 🌱 我正在学习Rust和基于Rust的操作系统开发
+- 🌱 我主要从事FPGA和嵌入式系统软件开发
 - 📫 我的邮箱: xueweiwujxw@outlook.com or xueweiwujxw@gmail.com
 - ⌨️ 我的Github账户 https://github.com/xueweiwujxw
 
