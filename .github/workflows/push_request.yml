@@ -1,16 +1,17 @@
 name: Pull Request Valid
 
 on:
-  push:
-    branches: ['**']
   # Runs on pushes targeting the default branch
-  pull_request:
+  pull_request_target:
     branches: ['master']
 
 # Default to bash
 defaults:
   run:
     shell: bash
+
+permissions:
+  contents: read
 
 jobs:
   # Hugo Check
@@ -20,6 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           submodules: recursive
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
