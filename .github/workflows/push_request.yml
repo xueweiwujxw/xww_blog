@@ -22,7 +22,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: ${{ vars.HUGO_VERSION || 'latest'}}
+          hugo-version: '0.156.0'
           extended: true
       - name: Clean last public
         run: rm -rf public
