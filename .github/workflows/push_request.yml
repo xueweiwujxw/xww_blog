@@ -13,7 +13,6 @@ defaults:
 jobs:
   # Hugo Check
   Actions-Hugo-Check:
-    environment: pr-check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
