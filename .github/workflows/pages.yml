@@ -45,8 +45,13 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: ${{ vars.HUGO_VERSION || 'latest'}}
+          hugo-version: '0.165.0'
           extended: true
+      - name: Setup Dart Sass
+        run: |
+          curl -fsSL https://github.com/sass/dart-sass/releases/download/1.103.1/dart-sass-1.103.1-linux-x64.tar.gz \
+            | tar -xz -C "${RUNNER_TEMP}"
+          echo "${RUNNER_TEMP}/dart-sass" >> "${GITHUB_PATH}"
       - name: Clean last public
         run: rm -rf public
       - name: Build with Hugo
