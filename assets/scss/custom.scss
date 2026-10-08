@@ -1,5 +1,4 @@
 @use "variables" as *;
-@use "core/mixins" as *;
 
 #aside-sakana {
   display: block;
@@ -7,7 +6,7 @@
   top: $header-height + 0.5rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  @include overflow-wrap(break-word);
+  overflow-wrap: break-word;
   box-sizing: border-box;
 }
 
