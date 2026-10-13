@@ -8,6 +8,7 @@ on:
 
   workflow_run:
     workflows: ['Update theme']
+    branches: ['master']
     types:
       - completed
 
@@ -33,6 +34,7 @@ defaults:
 jobs:
   # Build job
   build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

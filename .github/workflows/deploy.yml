@@ -8,6 +8,7 @@ on:
 
   workflow_run:
     workflows: ['Update theme']
+    branches: ['master']
     types:
       - completed
 
@@ -28,6 +29,7 @@ defaults:
 jobs:
   # Deployment job
   deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     environment: web-site-deploy
     runs-on: ubuntu-latest
     steps:
