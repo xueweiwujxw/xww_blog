@@ -1,7 +1,7 @@
 ---
 title: 'Xilinx Tandem PCIe 与 DFX'
 date: 2026-11-24T17:07:00+08:00
-lastmod: 2026-11-24T17:07:00+08:00
+lastmod: 2026-11-25T15:45:00+08:00
 draft: true
 description: 'Xilinx Tandem PCIe 与 DFX'
 images: []
@@ -9,63 +9,97 @@ tags: ['xilinx', 'vivado', 'pcie', 'dfx']
 categories: ['FPGA']
 ---
 
-**Tandem PCIe** 与 **DFX** 的配置流程。
+**Vivado DCP** 中的物理实现及 DFX 中 static 的保留。
 
 <!--more-->
 
-## Tandem Configuration
+## 为什么 Synth DCP 不能固定物理实现
 
-FPGA 作为 PCIe Endpoint 时，需要在主机枚举 PCIe 设备之前完成 PCIe 相关逻辑的配置。Tandem Configuration 将初始配置分为 Stage 1 和 Stage 2。
+将一个已经综合的模块通过 read_checkpoint 读入另一个工程，只能保证读入的是该模块的综合结果。对于未固定的逻辑，place_design 和 route_design 仍然需要决定其物理位置和路径。
 
-> 参考 [UG909 - Tandem Configuration and PCIe](https://docs.amd.com/r/2024.2-English/ug909-vivado-partial-reconfiguration/Tandem-Configuration-and-PCIe)。下面主要讨论 UltraScale+，其他器件需要参考对应的 IP 文档。
+要保留的是 placement 和 routing，而不仅仅是 netlist。
 
-### Tandem PROM
+> 参考 [UG909 - Preserving Implementation Data](https://docs.amd.com/r/en-US/ug909-vivado-partial-reconfiguration/Preserving-Implementation-Data)。
 
-Stage 1 和 Stage 2 均通过配置存储器加载。Stage 1 配置完成后，PCIe 相关逻辑可以开始建立 Link，剩余逻辑通过 Stage 2 完成配置。
+## 查看 DCP 中的信息
 
-### Tandem PCIe
+对于普通逻辑单元，LOC 表示 site，BEL 表示 site 内部的具体资源。对于 net，ROUTE 描述其布线路径。已分配位置与位置被固定是两回事。
 
-Stage 1 通过配置存储器加载，Stage 2 通过 PCIe 加载。对于支持该模式的 PCIe IP，可以通过 MCAP (Media Configuration Access Port) 传输配置数据。
+打开一个 routed checkpoint，查看指定实例。
 
-```goat
- .-------.         .---------.
- | Flash |-------->| Stage 1 |
- '-------'         '----+----'
-                        |
-                    PCIe Link
-                        |
- .-------.         .----v----.
- | Host  |-------->| Stage 2 |
- '-------'  PCIe   '---------'
+```tcl
+open_checkpoint config_a_routed.dcp
+report_property [get_cells u_static/q_reg]
+report_property [get_nets u_static/q]
 ```
 
-普通 Tandem PCIe 的 Stage 2 用于完成初始配置，不能直接将其当作运行过程中可反复加载的 partial bitstream。
+实际名称需要根据综合网表调整。重点关注以下属性。
 
-## DFX
+| 属性 | 用途 |
+| --- | --- |
+| LOC / BEL | cell 的位置 |
+| IS_LOC_FIXED / IS_BEL_FIXED | cell 位置的固定状态 |
+| ROUTE | net 的路由信息 |
+| FIXED_ROUTE / IS_ROUTE_FIXED | 固定路由信息及状态 |
 
-DFX (Dynamic Function eXchange) 将设计划分为 Static Region 和可重配置的区域。
+> 参考 [UG912 - Vivado Properties Reference](https://docs.amd.com/r/en-US/ug912-vivado-properties)。
 
-- RP (Reconfigurable Partition)：可重配置的层级。
-- RM (Reconfigurable Module)：RP 对应的具体逻辑实现。
-- Pblock：用于约束 RP 对应的物理资源范围。
+不能只比较 LOC：同一个 site 中仍有不同 BEL，也可能存在相同 placement 而 routing 不同的情况。
 
-```goat
- .--------------------------------.
- | Static                         |
- |    .----------------------.    |
- |    | RP                   |    |
- |    | RM_A / RM_B          |    |
- |    '----------------------'    |
- '--------------------------------'
+## DFX 最小设计
+
+下面使用一个与具体 IP 无关的设计说明流程。Static 中包含输入输出寄存器，RP 中只放组合逻辑，两个 RM 使用相同接口。
+
+```verilog
+module top(
+    input  wire clk,
+    input  wire a,
+    input  wire b,
+    output reg  q
+);
+    reg x, y;
+    wire z;
+
+    always @(posedge clk) begin
+        x <= a;
+        y <= b;
+        q <= z;
+    end
+
+    op u_rp (.a(x), .b(y), .z(z));
+endmodule
 ```
 
-RM_A 和 RM_B 是同一个 RP 的不同实现，需要满足对应的接口约束。通过 partial bitstream 可以替换 RP 内部的 RM，而不重新配置 Static Region。
+RM_A：
 
-### DCP
+```verilog
+module op(input wire a, b, output wire z);
+    assign z = a ^ b;
+endmodule
+```
 
-Synth DCP 包含综合后的设计信息，后续还需要进行 place 和 route。Routed DCP 则包含已经完成布线的设计信息。
+RM_B：
 
-对于 DFX，可以将初始 configuration 中的 RM 移除，并保留 Static Region 的物理实现。
+```verilog
+module op(input wire a, b, output wire z);
+    assign z = a & b;
+endmodule
+```
+
+两个 op 分别进行 OOC synthesis，不要同时读入两个同名模块。top 综合时将 op 定义为 black box。器件、时钟、IO 和 Pblock 根据实验板卡配置；这里不提供绑定到某个实际器件的约束。
+
+在已链接 RM_A 的设计中设置 RP，并添加实际合法的 Pblock。
+
+```tcl
+set_property HD.RECONFIGURABLE true [get_cells u_rp]
+create_pblock pblock_rp
+add_cells_to_pblock [get_pblocks pblock_rp] [get_cells u_rp]
+# resize_pblock 使用实际器件上合法的 SLICE 范围
+```
+
+完成 DFX DRC、place、route 和时序检查后，将初始 configuration 保存为 config_a_routed.dcp。
+
+## 提取 Static
 
 ```tcl
 open_checkpoint config_a_routed.dcp
@@ -74,7 +108,33 @@ lock_design -level routing
 write_checkpoint -force static_routed.dcp
 ```
 
-后续可以读入新的 RM。
+update_design 移除的是 RP 内的逻辑实现，并不删除 RP 对应的层级接口。lock_design 用来保留剩余设计的物理实现。
+
+这里只针对 DFX 流程，不建议通过逐个设置 IS_LOC_FIXED 的方式代替该步骤，因为跨边界 net 和 routing 也需要处理。
+
+### 比较物理实现
+
+对于完全位于 static 中的普通逻辑，可以导出 cell 和 net 的属性，比较不同 checkpoint。
+
+```tcl
+proc dump_phys {path cells nets} {
+    set fd [open $path w]
+    foreach c [lsort $cells] {
+        puts $fd [list CELL $c [get_property LOC $c] \
+                             [get_property BEL $c]]
+    }
+    foreach n [lsort $nets] {
+        puts $fd [list NET $n [get_property ROUTE $n]]
+    }
+    close $fd
+}
+```
+
+调用时显式传入确认属于 static 的 cell 和 net，不要将整个设计的 net 都拿来比较。跨 RP 接口的 net 包含可以改变的 RM 侧路径，不能将完整 ROUTE 当作 static 是否变化的判断依据。
+
+使用相同的对象清单分别在初始 configuration 和后续 configuration 中导出，然后通过 diff 查看。这个方法只能辅助定位问题，不能代替 pr_verify。
+
+## 插入 RM_B
 
 ```tcl
 open_checkpoint static_routed.dcp
@@ -83,61 +143,43 @@ opt_design
 place_design
 route_design
 write_checkpoint -force config_b_routed.dcp
-```
 
-上面的命令只用于说明 DCP 的处理过程，RP、Pblock 和相关约束需要提前配置。生成 bitstream 前还需要检查时序和不同 configuration 的兼容性。
-
-```tcl
 pr_verify -full_check config_a_routed.dcp config_b_routed.dcp
 ```
 
-> 参考 [UG909 - Dynamic Function eXchange](https://docs.amd.com/r/2024.2-English/ug909-vivado-partial-reconfiguration)。
+pr_verify 用于检查 DFX configuration 的兼容性，不是 timing signoff。两个 configuration 都需要独立检查时序。
 
-## Tandem PCIe with Field Updates
+### 为什么 Static 已经收敛，仍然需要检查时序
 
-Tandem 解决初始配置问题，DFX 解决运行过程中的逻辑更新问题。支持 Field Updates 的模式将两者结合。
-
-```goat
- .---------.
- | Stage 1 |
- '----+----'
-      |
-      v
- .---------.
- | Stage 2 |
- '----+----'
-      |
-      v
- .--------------.     .-------------------.
- | Initial RM   |<----| Partial Bitstream |
- '--------------'     '-------------------'
-```
-
-需要区分 Stage 2 bitstream 和后续用于更新 RP 的 partial bitstream。Stage 1、Stage 2 是配置阶段的划分，并不完全等价于 Static 和 RP 的划分。
-
-> 参考 [PG213 - UltraScale+ Devices Integrated Block for PCI Express](https://docs.amd.com/r/en-US/pg213-pcie4-ultrascale-plus)。
-
-## Nested DFX
-
-Nested DFX 允许在 RP 内继续划分下一级 RP。
+假设路径由 static 中的寄存器发出，在 RP 内经过组合逻辑，最后到达 static 中的寄存器。
 
 ```goat
- .--------------------------------.
- | Static                         |
- | .----------------------------. |
- | | Parent RP                  | |
- | |   Parent Logic             | |
- | |   .--------------------.   | |
- | |   | Child RP           |   | |
- | |   '--------------------'   | |
- | '----------------------------' |
- '--------------------------------'
+ .----.        .------------.        .----.
+ | FF |------->| RM logic   |------->| FF |
+ '----'        '------------'        '----'
+ static             RP               static
 ```
 
-更新 Child RP 时，可以保留当前 Parent RM 中的其他逻辑。更新 Parent RP 时，内部的 Child RP 也属于被重新配置的范围。
+两个端点的 placement 可以相同，static 侧路由也可以保留，但 RM 的逻辑和路由不同，整个路径的 delay 就可能改变。
 
-Abstract Shell 则是面向特定 RP 的设计检查点，用于保留 RM 实现所需的物理和时序上下文，两者不是同一个概念。
+Partition Pin 是边界路由的连接位置，并不等于在这里自动插入一个寄存器。如果 RP 接口有大量组合路径，固定外部设计后，后续 RM 的时序优化空间会受到限制。
 
-> [!NOTE]
->
-> Nested DFX、Abstract Shell 和 Tandem 的组合支持情况需要根据器件、PCIe IP 和 Vivado 版本确认，不能仅根据各个功能分别受支持就认为组合方式可用。
+> 参考 [UG909 - Register Inputs and Outputs of RMs](https://docs.amd.com/r/en-US/ug909-vivado-partial-reconfiguration/Register-Inputs-and-Outputs-of-RMs)。
+
+## Abstract Shell 和 Nested DFX
+
+Abstract Shell 不是将 static 的所有 cell 简单删除。它保留当前 RP 实现需要的物理资源限制、接口连接和时序上下文，减少无关逻辑。
+
+Nested DFX 则允许在 Parent RP 内继续定义 Child RP。相对于 Child RP，Parent RM 中不属于 Child RP 的部分可以保留；相对于 Parent RP，这些逻辑仍然属于可更新范围。
+
+两者分别解决设计数据库和更新粒度的问题，不是同一个功能。
+
+## Tandem PCIe
+
+Tandem Stage 1 / Stage 2 是初始配置顺序，DFX Static / RP 是运行时可重配置边界。不能根据前者直接推导后者的范围。
+
+对于 Tandem PCIe with Field Updates，需要根据 PCIe IP 对应的官方流程确定初始配置文件及后续 partial bitstream。普通 DFX 的 DCP 提取流程并不能证明某种 Tandem、Nested DFX、Abstract Shell 组合一定受支持。
+
+> 参考 [PG213](https://docs.amd.com/r/en-US/pg213-pcie4-ultrascale-plus) 和 [UG909](https://docs.amd.com/r/en-US/ug909-vivado-partial-reconfiguration)。
+
+上述最小设计用于验证物理实现的保留方法，未进行实际 Vivado implementation，不包含板卡相关的 Pblock、XDC 或时序结果。
